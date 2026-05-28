@@ -54,6 +54,23 @@ class Event:
             provider=_string_or_none(payload.get("provider")),
         )
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "timestamp": _format_utc_datetime(self.timestamp),
+            "tenant_id": self.tenant_id,
+            "user_id": self.user_id,
+            "api_key_id": self.api_key_id,
+            "endpoint": self.endpoint,
+            "method": self.method,
+            "status_code": self.status_code,
+            "latency_ms": self.latency_ms,
+            "ip": self.ip,
+            "country": self.country,
+            "cost_units": self.cost_units,
+            "provider": self.provider,
+            "request_id": self.request_id,
+        }
+
 
 @dataclass(frozen=True)
 class Anomaly:
@@ -106,6 +123,10 @@ def _parse_utc_datetime(value: str) -> datetime:
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed.astimezone(timezone.utc)
+
+
+def _format_utc_datetime(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _required(payload: dict[str, Any], key: str) -> Any:
