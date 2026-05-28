@@ -1,16 +1,17 @@
 # OpsMitra Task Tracker
 
-## Current Phase: Step 1 - Product Contract and Architecture
+## Current Phase: Step 2 - Python Project Skeleton
 
 - [x] Create initial OpsMitra build plan.
 - [x] Generate ECC plan-orchestrate prompts.
 - [x] Wait for user approval before moving to Step 1.
 - [x] Define product contract and architecture docs.
+- [x] Create Python project skeleton using TDD.
 
 ## Planned Phases
 
 - [x] Step 1: Define Product Contract and Architecture
-- [ ] Step 2: Create Python Project Skeleton
+- [x] Step 2: Create Python Project Skeleton
 - [ ] Step 3: Build Synthetic Log Generator
 - [ ] Step 4: Implement Deterministic Detectors
 - [ ] Step 5: Add Local Model Summarization
@@ -22,5 +23,6 @@
 
 ## Review Notes
 
-- Step 1 architecture/contracts are drafted.
-- Pending: user approval before moving to Step 2 project skeleton/tests.
+- Step 1 architecture/contracts are drafted and committed.
+- Step 2 started after user approval.
+- Step 2 Python skeleton created with tests first; pytest coverage passed at 93%.

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opsmitra"
+version = "0.1.0"
+description = "Private AI-assisted log anomaly detector for learning AWS, local models, and alerting."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Bhushan" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9.0",
+  "pytest-cov>=7.0",
+]
+
+[project.scripts]
+opsmitra = "opsmitra.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
