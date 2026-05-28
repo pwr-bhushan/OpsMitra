@@ -1,16 +1,16 @@
-# Mitra Build Plan
+# OpsMitra Build Plan
 
-**Project name**: Mitra
+**Project name**: OpsMitra
 **Purpose**: Build a private AI-assisted AWS log anomaly detector for learning AWS, local/private model integration, alerting, and AI-native backend architecture.
 **Primary principle**: Deterministic code detects anomalies. The local model explains, prioritizes, and recommends actions.
 
 ## Scope
 
-Mitra v0 will use synthetic SaaS logs first, then add AWS ingestion/querying. It will not process production logs, auto-disable customer accounts, or rely on an LLM as the primary anomaly detector.
+OpsMitra v0 will use synthetic SaaS logs first, then add AWS ingestion/querying. It will not process production logs, auto-disable customer accounts, or rely on an LLM as the primary anomaly detector.
 
 ## Step 1: Define Product Contract and Architecture
 
-Design the Mitra v0 system contract, including event schema, anomaly schema, detector responsibilities, local model responsibilities, and AWS deployment boundaries. Decide the local-first architecture and document why detection stays deterministic while the model only explains evidence.
+Design the OpsMitra v0 system contract, including event schema, anomaly schema, detector responsibilities, local model responsibilities, and AWS deployment boundaries. Decide the local-first architecture and document why detection stays deterministic while the model only explains evidence.
 
 Acceptance:
 - Architecture document explains local simulation, AWS data flow, detector service, model summarizer, and alert delivery.
@@ -19,7 +19,7 @@ Acceptance:
 
 ## Step 2: Create Python Project Skeleton
 
-Create the Python project structure for Mitra with package layout, CLI entry points, configuration loading, typed domain models, and pytest setup. Keep the code local-only in this phase.
+Create the Python project structure for OpsMitra with package layout, CLI entry points, configuration loading, typed domain models, and pytest setup. Keep the code local-only in this phase.
 
 Acceptance:
 - `pytest` runs successfully.
