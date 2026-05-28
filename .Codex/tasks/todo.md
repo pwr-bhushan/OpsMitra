@@ -1,6 +1,6 @@
 # OpsMitra Task Tracker
 
-## Current Phase: Step 3 - Synthetic Log Generator
+## Current Phase: Step 4 - Deterministic Detectors
 
 - [x] Create initial OpsMitra build plan.
 - [x] Generate ECC plan-orchestrate prompts.
@@ -8,13 +8,14 @@
 - [x] Define product contract and architecture docs.
 - [x] Create Python project skeleton using TDD.
 - [x] Build synthetic log generator.
+- [x] Implement deterministic detectors.
 
 ## Planned Phases
 
 - [x] Step 1: Define Product Contract and Architecture
 - [x] Step 2: Create Python Project Skeleton
 - [x] Step 3: Build Synthetic Log Generator
-- [ ] Step 4: Implement Deterministic Detectors
+- [x] Step 4: Implement Deterministic Detectors
 - [ ] Step 5: Add Local Model Summarization
 - [ ] Step 6: Add Slack Alert Delivery
 - [ ] Step 7: Add AWS S3 and Athena Integration
@@ -28,3 +29,4 @@
 - Step 2 started after user approval.
 - Step 2 Python skeleton created with tests first; pytest coverage passed at 93%.
 - Step 3 synthetic generator created with deterministic seeded output and injectable incidents; full pytest coverage passed at 94%.
+- Step 4 deterministic detectors created for SMS abuse, auth bursts, endpoint error rates, and cost runaway usage; full pytest coverage passed at 95%.

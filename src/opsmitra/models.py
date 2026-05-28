@@ -116,6 +116,22 @@ class Anomaly:
             recommended_actions=actions,
         )
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "type": self.type,
+            "severity": self.severity,
+            "window_start": _format_utc_datetime(self.window_start),
+            "window_end": _format_utc_datetime(self.window_end),
+            "tenant_id": self.tenant_id,
+            "subject": self.subject,
+            "observed": self.observed,
+            "baseline": self.baseline,
+            "ratio": self.ratio,
+            "evidence": self.evidence,
+            "recommended_actions": self.recommended_actions,
+        }
+
 
 def _parse_utc_datetime(value: str) -> datetime:
     normalized = value.replace("Z", "+00:00")
