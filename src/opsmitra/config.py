@@ -26,8 +26,9 @@ class AwsConfig:
 @dataclass(frozen=True)
 class ModelConfig:
     provider: str
-    endpoint_url: str | None
-    model_name: str | None
+    endpoint_url: str
+    model_name: str
+    timeout_seconds: float
 
 
 @dataclass(frozen=True)
@@ -61,8 +62,9 @@ def load_config(env: Mapping[str, str] | None = None) -> AppConfig:
         ),
         model=ModelConfig(
             provider=_get(values, "OPSMITRA_MODEL_PROVIDER", "fallback"),
-            endpoint_url=_optional(values, "OPSMITRA_MODEL_ENDPOINT_URL"),
-            model_name=_optional(values, "OPSMITRA_MODEL_NAME"),
+            endpoint_url=_get(values, "OPSMITRA_MODEL_URL", "http://localhost:11434"),
+            model_name=_get(values, "OPSMITRA_MODEL_NAME", "llama3.1:8b"),
+            timeout_seconds=_parse_float(_get(values, "OPSMITRA_MODEL_TIMEOUT", "10")),
         ),
         alert=AlertConfig(
             slack_webhook_url=_optional(values, "OPSMITRA_SLACK_WEBHOOK_URL"),
@@ -88,3 +90,21 @@ def _parse_bool(value: str, *, default: bool) -> bool:
     if normalized in {"0", "false", "no", "off"}:
         return False
     return default
+
+
+def _parse_float(value: str) -> float:
+    """Parse a string to a float.
+
+    Args:
+        value: String to parse.
+
+    Returns:
+        Parsed float.
+
+    Raises:
+        ValueError: If the value is not a valid float.
+    """
+    try:
+        return float(value.strip())
+    except (ValueError, AttributeError) as e:
+        raise ValueError(f"Invalid float value: {value}") from e

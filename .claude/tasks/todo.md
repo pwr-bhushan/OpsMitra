@@ -1,6 +1,6 @@
 # OpsMitra Task Tracker
 
-## Current Phase: Step 4 - Deterministic Detectors
+## Current Phase: Step 6 - Slack Alert Delivery
 
 - [x] Create initial OpsMitra build plan.
 - [x] Generate ECC plan-orchestrate prompts.
@@ -9,6 +9,7 @@
 - [x] Create Python project skeleton using TDD.
 - [x] Build synthetic log generator.
 - [x] Implement deterministic detectors.
+- [x] Add local model summarization with Ollama client and deterministic fallback.
 
 ## Planned Phases
 
@@ -16,7 +17,7 @@
 - [x] Step 2: Create Python Project Skeleton
 - [x] Step 3: Build Synthetic Log Generator
 - [x] Step 4: Implement Deterministic Detectors
-- [ ] Step 5: Add Local Model Summarization
+- [x] Step 5: Add Local Model Summarization
 - [ ] Step 6: Add Slack Alert Delivery
 - [ ] Step 7: Add AWS S3 and Athena Integration
 - [ ] Step 8: Add Scheduler and Runtime Command
@@ -30,3 +31,4 @@
 - Step 2 Python skeleton created with tests first; pytest coverage passed at 93%.
 - Step 3 synthetic generator created with deterministic seeded output and injectable incidents; full pytest coverage passed at 94%.
 - Step 4 deterministic detectors created for SMS abuse, auth bursts, endpoint error rates, and cost runaway usage; full pytest coverage passed at 95%.
+- Step 5 local model summarization added with Ollama-compatible HTTP client, scoped-evidence prompt, validated fallback, model config via env (`OPSMITRA_MODEL_NAME`, `OPSMITRA_MODEL_URL`, `OPSMITRA_MODEL_TIMEOUT`); 31/31 tests passing at 95% coverage.

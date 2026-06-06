@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from opsmitra.config import AppConfig, load_config
 
 
@@ -26,7 +28,7 @@ def test_load_config_reads_environment_without_hardcoded_secrets(monkeypatch):
         "OPSMITRA_ATHENA_TABLE": "events",
         "OPSMITRA_ATHENA_OUTPUT_LOCATION": "s3://query-results/",
         "OPSMITRA_MODEL_PROVIDER": "ollama",
-        "OPSMITRA_MODEL_ENDPOINT_URL": "http://localhost:11434",
+        "OPSMITRA_MODEL_URL": "http://localhost:11434",
         "OPSMITRA_MODEL_NAME": "llama3.1",
         "OPSMITRA_SLACK_WEBHOOK_URL": "https://hooks.slack.test/example",
         "OPSMITRA_DRY_RUN": "false",
@@ -52,3 +54,37 @@ def test_dry_run_parser_defaults_to_safe_true_for_unknown_values():
     config = load_config({"OPSMITRA_DRY_RUN": "unexpected"})
 
     assert config.alert.dry_run is True
+
+
+# ---------------------------------------------------------------------------
+# ModelConfig: defaults, env overrides, and malformed timeout handling
+# ---------------------------------------------------------------------------
+
+
+def test_config_loads_model_defaults_when_env_unset():
+    """When model env vars are absent, config uses documented defaults."""
+    config = load_config({})
+
+    assert config.model.model_name == "llama3.1:8b"
+    assert config.model.endpoint_url == "http://localhost:11434"
+    assert config.model.timeout_seconds == 10.0
+
+
+def test_config_reads_model_env_overrides():
+    """OPSMITRA_MODEL_NAME, OPSMITRA_MODEL_URL, and OPSMITRA_MODEL_TIMEOUT override defaults."""
+    env = {
+        "OPSMITRA_MODEL_NAME": "mistral:7b",
+        "OPSMITRA_MODEL_URL": "http://10.0.0.5:11434",
+        "OPSMITRA_MODEL_TIMEOUT": "3.5",
+    }
+    config = load_config(env)
+
+    assert config.model.model_name == "mistral:7b"
+    assert config.model.endpoint_url == "http://10.0.0.5:11434"
+    assert config.model.timeout_seconds == 3.5
+
+
+def test_config_rejects_malformed_model_timeout():
+    """When OPSMITRA_MODEL_TIMEOUT is not a valid number, config raises ValueError."""
+    with pytest.raises((ValueError, TypeError)):
+        load_config({"OPSMITRA_MODEL_TIMEOUT": "not-a-number"})
