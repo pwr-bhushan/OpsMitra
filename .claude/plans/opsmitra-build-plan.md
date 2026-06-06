@@ -52,6 +52,7 @@ Acceptance:
 - Summarizer works with a mocked model client in tests.
 - Prompt includes scoped evidence only, not raw full logs.
 - Model output has a validated fallback if the local model is unavailable.
+- Model identity is pinned in config: model name (e.g. `llama3.1:8b`), endpoint URL (`OPSMITRA_MODEL_URL`, default `http://localhost:11434`), and a hard request timeout that triggers the fallback path. No hardcoded model names in code.
 
 ## Step 6: Add Slack Alert Delivery
 
@@ -70,6 +71,7 @@ Acceptance:
 - AWS code is isolated behind interfaces.
 - Athena query text is tested for partition filters.
 - Local tests do not require AWS credentials.
+- Detector thresholds are loaded from config (per-tenant / per-endpoint overrides supported), not hardcoded constants — so real Athena data can be tuned without code changes.
 
 ## Step 8: Add Scheduler and Runtime Command
 
@@ -79,6 +81,7 @@ Acceptance:
 - CLI can run a complete local demo from generated logs to dry-run alert.
 - Exit codes distinguish success, detected anomalies, and runtime failure.
 - Runtime logs are structured and safe.
+- Anomalies have a stable fingerprint (type + tenant + subject) and the runtime suppresses re-alerts for the same fingerprint within a configurable cooldown window, so scheduled runs over rolling windows do not spam Slack.
 
 ## Step 9: Build Evaluation Harness
 
@@ -97,3 +100,4 @@ Acceptance:
 - Security review checklist is documented.
 - README can guide a new developer through local demo.
 - AWS cost controls and partitioning assumptions are documented.
+- A documented "AWS-window replay" exercise: run the detectors against a real Athena window of OpsMitra's own AWS data, capture which anomalies fired, and record findings. This is the primary learning-goal milestone of the project.
