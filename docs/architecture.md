@@ -109,6 +109,93 @@ Slack webhook
 
 S3 data should be partitioned by date and hour where practical. Athena queries must include partition filters to control cost.
 
+## Pipeline Diagram (D1)
+
+The diagram below shows both local mode (left branch) and AWS mode (right branch)
+feeding into the same `Runtime.execute` pipeline. The two modes share every stage
+after the event-source boundary.
+
+```mermaid
+flowchart TD
+    subgraph Local mode
+        L1[generator] --> L2[LocalNDJSONEventSource]
+    end
+    subgraph AWS mode
+        A1[S3 bucket] --> A2[AthenaEventSource]
+        A2 -. uses .-> AQ[query_builder]
+    end
+    L2 --> R[Runtime.execute]
+    A2 --> R
+    R --> D[detect_anomalies]
+    D --> S[Summarizer\nor FallbackSummarizer]
+    S --> SA[SlackAlerter\ndry-run or send]
+    SA --> CD[AnomalyCooldown\npersist]
+```
+
+## Runtime Sequence (D2)
+
+The sequence diagram traces a single `Runtime.execute` call from CLI invocation
+through event fetching, anomaly detection, per-anomaly cooldown gating, summarization,
+Slack delivery, and final cooldown persistence.
+
+Validation is two-stage: `Runtime.__init__` raises `RuntimeConfigurationError` if
+`dry_run=False` and the Slack webhook URL is absent; `Runtime.execute` raises
+`RuntimeConfigurationError` if `window_start >= window_end`. See `runtime.py` for
+the implementation.
+
+```mermaid
+sequenceDiagram
+    participant CLI
+    participant Runtime
+    participant EventSource
+    participant Detectors
+    participant Cooldown
+    participant Summarizer
+    participant Slack
+    Note over Runtime: __init__ guard:<br/>RuntimeConfigurationError if<br/>dry_run=False and webhook missing
+    CLI->>Runtime: Runtime(source, alerter, cooldown, thresholds, dry_run=…)
+    Note over Runtime: execute() guard:<br/>RuntimeConfigurationError if<br/>window_start >= window_end
+    CLI->>Runtime: execute(window_start, window_end)
+    Runtime->>EventSource: fetch_events(start, end, tenant)
+    EventSource-->>Runtime: list[Event]
+    Runtime->>Detectors: detect_anomalies(events, thresholds)
+    Detectors-->>Runtime: list[Anomaly]
+    loop per anomaly
+        Runtime->>Cooldown: should_alert(anomaly)?
+        alt fresh — not in cooldown window
+            Runtime->>Summarizer: summarize(anomaly)
+            Summarizer-->>Runtime: AlertSummary
+            Runtime->>Slack: send(summary, anomaly)
+            Slack-->>Runtime: DeliveryResult
+            Runtime->>Cooldown: record_alerted(anomaly)
+        else within cooldown window
+            Note over Runtime: suppress — increment suppressed count
+        end
+    end
+    Runtime->>Cooldown: persist()
+    Runtime-->>CLI: RuntimeResult
+```
+
+## Evaluation Harness (D3)
+
+The evaluation harness runs detectors against labelled fixture files without touching
+`Runtime`, cooldown, or Slack. The diagram shows data flow from fixture files through
+case loading, detection, greedy bipartite matching, and final report generation.
+
+```mermaid
+flowchart LR
+    F["tests/fixtures/evaluation/\n*.events.jsonl + *.expected.json"] --> L[load_case]
+    L --> EC[EvaluationCase]
+    EC --> E["evaluate_case\nbypasses Runtime, no cooldown"]
+    E --> DA[detect_anomalies]
+    DA --> M["bipartite match\ngreedy — expected order\nsorted anomalies"]
+    M --> CR[CaseResult]
+    CR --> AGG[evaluate_all]
+    AGG --> R[EvaluationReport]
+    R --> RT[format_report_table]
+    R --> RJ[format_report_json]
+```
+
 ## Failure Handling
 
 - If detector input cannot be read, return a runtime failure exit code.

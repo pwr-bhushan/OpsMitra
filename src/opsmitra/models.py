@@ -9,6 +9,16 @@ from typing import Any
 
 VALID_SEVERITIES = {"low", "medium", "high", "critical"}
 
+# Canonical set of event endpoint types — single source of truth shared by
+# query_builder.py, detectors, and tests. Extend here when new event types
+# are introduced.
+EVENT_TYPES: frozenset[str] = frozenset({
+    "/sms/send",
+    "/auth/login",
+    "/checkout",
+    "/jobs/process",
+})
+
 
 @dataclass(frozen=True)
 class Event:

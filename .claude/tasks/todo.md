@@ -1,7 +1,8 @@
 # OpsMitra Task Tracker
 
-## Current Phase: Step 6 - Slack Alert Delivery
+## Current Phase: ✅ BUILD PLAN COMPLETE — all 10 steps shipped
 
+- [x] Add scheduler + runtime CLI with fingerprint cooldown and structured logging.
 - [x] Create initial OpsMitra build plan.
 - [x] Generate ECC plan-orchestrate prompts.
 - [x] Wait for user approval before moving to Step 1.
@@ -10,6 +11,10 @@
 - [x] Build synthetic log generator.
 - [x] Implement deterministic detectors.
 - [x] Add local model summarization with Ollama client and deterministic fallback.
+- [x] Add Slack alert delivery with dry-run, retry, and redacted logging.
+- [x] Add AWS S3 + Athena integration with config-driven detector thresholds.
+- [x] Add evaluation harness with fixture datasets, p95 detection delays, and strict-mode CI gating.
+- [x] Add security/cost/docs hardening with Mermaid architecture diagrams, threshold unification, durable cooldown lock, and AWS-window replay exercise.
 
 ## Planned Phases
 
@@ -18,11 +23,11 @@
 - [x] Step 3: Build Synthetic Log Generator
 - [x] Step 4: Implement Deterministic Detectors
 - [x] Step 5: Add Local Model Summarization
-- [ ] Step 6: Add Slack Alert Delivery
-- [ ] Step 7: Add AWS S3 and Athena Integration
-- [ ] Step 8: Add Scheduler and Runtime Command
-- [ ] Step 9: Build Evaluation Harness
-- [ ] Step 10: Security, Cost, and Documentation Hardening
+- [x] Step 6: Add Slack Alert Delivery
+- [x] Step 7: Add AWS S3 and Athena Integration
+- [x] Step 8: Add Scheduler and Runtime Command
+- [x] Step 9: Build Evaluation Harness
+- [x] Step 10: Security, Cost, and Documentation Hardening
 
 ## Review Notes
 
@@ -32,3 +37,8 @@
 - Step 3 synthetic generator created with deterministic seeded output and injectable incidents; full pytest coverage passed at 94%.
 - Step 4 deterministic detectors created for SMS abuse, auth bursts, endpoint error rates, and cost runaway usage; full pytest coverage passed at 95%.
 - Step 5 local model summarization added with Ollama-compatible HTTP client, scoped-evidence prompt, validated fallback, model config via env (`OPSMITRA_MODEL_NAME`, `OPSMITRA_MODEL_URL`, `OPSMITRA_MODEL_TIMEOUT`); 31/31 tests passing at 95% coverage.
+- Step 6 Slack alerter added with Block Kit formatting, retry on 5xx/timeout, dry-run default, exact-substring URL redaction, and bounds-checked config; 59/59 tests passing at 94% module coverage.
+- Step 7 AWS S3 + Athena integration added with `EventSource`/`EventSink` Protocols, boto3 isolated under `opsmitra.aws.*` (subprocess test enforces zero leaks), partition-pruned Athena query builder with regex injection guards, S3 NDJSON sink with UUID-suffixed keys + 100 MB safety cap, and config-driven `DetectorThresholds` with per-tenant/per-endpoint precedence; 142/142 tests passing at 96% suite coverage.
+- Step 8 scheduler + runtime CLI added with `Runtime` orchestrator (EventSource → detectors → Summarizer → SlackAlerter pipeline), `AnomalyCooldown` JSON-backed dedup with tz-aware datetimes, `python -m opsmitra run` entry point, exit codes 0/1/2 distinguishing clean/error/anomalies-detected, and structured logging proven safe (sentinel webhook URL never leaks); 197/197 tests passing at 95% suite coverage.
+- Step 9 evaluation harness added with `EvaluationCase`/`CaseResult`/`EvaluationReport` dataclasses, fixture-based replay (3 committed: sms-abuse-baseline, auth-burst-baseline, noise-only), bipartite match with deterministic anomaly sort, p95 nearest-rank for n≥100, `detection_delay_upper_bound_seconds` upper-bound metric, 1 MB fixture cap, `--strict` mode that fails only on `must_detect` misses; 230/230 tests passing at 95% suite coverage.
+- Step 10 hardening shipped: 4 Mermaid diagrams (3 in architecture.md, 1 in README), security checklist with least-privilege IAM, AWS cost controls with workgroup byte cap, AWS-window replay exercise template, threshold unification M6 preserving baseline-ratio defense, durable cooldown fcntl lock on `<path>.lock`, argparse exit 64 (EX_USAGE), CLI `--config-file` fully wired for both `run` and `eval` subcommands; 253/253 tests passing at 95% suite coverage. FINAL build plan step complete.
