@@ -47,6 +47,9 @@ cd opsmitra
 python -m venv .venv
 .venv/bin/pip install -e ".[dev]"
 
+# Copy the env template and edit with your values (the real `.env` is gitignored)
+cp .env.example .env
+
 # Run the full test suite
 .venv/bin/pytest
 
@@ -97,6 +100,10 @@ config before paying for Athena round-trips.
 All configuration is via environment variables. Secrets must **never** be
 hardcoded — see [`docs/security-checklist.md`](docs/security-checklist.md) for
 the secret-handling policy.
+
+A copy-pasteable template lives at [`.env.example`](.env.example) with every
+supported `OPSMITRA_*` var, its default, and a `REQUIRED` / `OPTIONAL` /
+`CONDITIONAL` tag. The tables below are the same content in reference form.
 
 ### Model
 
