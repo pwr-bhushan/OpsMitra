@@ -1,0 +1,22 @@
+{
+  "name": "sms-abuse-baseline",
+  "description": "Single SMS abuse incident on tenant_acme over a 60-minute window.",
+  "window": {
+    "start": "2026-01-15T00:00:00Z",
+    "end": "2026-01-15T01:00:00Z"
+  },
+  "expected_incidents": [
+    {
+      "type": "sms_abuse_spike",
+      "tenant_id": "tenant_acme",
+      "subject": {
+        "api_key_id": "key_acme_abused",
+        "endpoint": "/sms/send"
+      },
+      "severity": "high",
+      "first_seen": "2026-01-15T00:05:00Z",
+      "must_detect": true
+    }
+  ],
+  "thresholds": null
+}

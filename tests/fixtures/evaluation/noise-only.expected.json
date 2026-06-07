@@ -1,0 +1,10 @@
+{
+  "name": "noise-only",
+  "description": "Normal baseline traffic across 3 tenants \u2014 no incidents injected. FP regression guard.",
+  "window": {
+    "start": "2026-01-15T04:00:00Z",
+    "end": "2026-01-15T05:00:00Z"
+  },
+  "expected_incidents": [],
+  "thresholds": null
+}
