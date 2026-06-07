@@ -58,10 +58,37 @@ python -m venv .venv
   --window-start 2026-06-01T00:00:00Z \
   --window-end   2026-06-01T01:00:00Z \
   --dry-run
+
+# Validate that the current env satisfies every active mode
+.venv/bin/python -m opsmitra validate
 ```
 
 Exit codes: `0` = no anomalies, `2` = anomalies detected, `1` = runtime error,
 `64` = CLI usage error.
+
+### Preflight: `opsmitra validate`
+
+`opsmitra validate` is a network-free preflight that groups every `OPSMITRA_*`
+env var by feature mode (`model`, `slack`, `aws-source`, `aws-sink`, `runtime`,
+`eval`) and reports per-mode status. Modes auto-detect from the environment:
+`OPSMITRA_DRY_RUN=false` activates the `slack` checks; `OPSMITRA_EVENT_SOURCE=athena`
+activates `aws-source`; etc.
+
+```bash
+# All modes, human-readable table (default)
+.venv/bin/python -m opsmitra validate
+
+# Only the AWS checks, JSON output
+.venv/bin/python -m opsmitra validate --mode aws-source,aws-sink --report json
+
+# CI gate: exit 1 if any active mode is missing a required env var
+.venv/bin/python -m opsmitra validate --strict
+```
+
+The webhook URL is reported as `set` / `unset` only — its value never reaches
+the rendered output. Run this before the AWS-window replay exercise
+([`docs/aws-window-replay.md`](docs/aws-window-replay.md)) to catch missing
+config before paying for Athena round-trips.
 
 ---
 

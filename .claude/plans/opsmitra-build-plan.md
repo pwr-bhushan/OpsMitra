@@ -101,3 +101,16 @@ Acceptance:
 - README can guide a new developer through local demo.
 - AWS cost controls and partitioning assumptions are documented.
 - A documented "AWS-window replay" exercise: run the detectors against a real Athena window of OpsMitra's own AWS data, capture which anomalies fired, and record findings. This is the primary learning-goal milestone of the project.
+
+## Step 11 (post-v0): Env Validation Preflight
+
+Add an `opsmitra validate` subcommand that consolidates the scattered preflight checks (load-time bounds in `config.py`, Stage 1 guard in `Runtime.__init__`, use-time AWS bucket/output checks) into a single command. Group required + optional env vars by feature mode (`model`, `slack`, `aws-source`, `aws-sink`, `runtime`, `eval`). Auto-detect which modes are "active" from the env (e.g. `OPSMITRA_DRY_RUN=false` activates `slack` mode; `OPSMITRA_EVENT_SOURCE=athena` activates `aws-source`). Per-mode status: `ok` / `warning` (optional unset) / `error` (required missing or invalid). Pure config — no network calls. Future `--probe` flag for opt-in reachability checks (Ollama HTTP, Slack webhook OPTIONS, Athena workgroup) is out of scope for this step.
+
+Acceptance:
+- `python -m opsmitra validate` prints per-mode status table; exit 0 if all active modes pass.
+- `--mode <name>` (or comma-separated) filters which modes are checked.
+- `--report json` emits machine-readable output (round-trips via `json.loads`).
+- `--strict` exits 1 if any required-for-active-mode var is missing or invalid.
+- Cross-field invariants enforced: `dry_run=false` requires `OPSMITRA_SLACK_WEBHOOK_URL`; `EVENT_SOURCE=athena` requires `OPSMITRA_ATHENA_OUTPUT_LOCATION`; `EVENT_SINK=s3` requires `OPSMITRA_S3_BUCKET`.
+- No env var listed in the report leaks the value of any secret (`SLACK_WEBHOOK_URL` is reported as `set`/`unset` only, never the URL itself).
+- README documents the command; security-checklist.md references it as a preflight before AWS replay.

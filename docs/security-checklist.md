@@ -105,6 +105,18 @@ files committed to version control.
 | AWS secret | `AWS_SECRET_ACCESS_KEY` | Prefer instance role or IRSA |
 | AWS session token | `AWS_SESSION_TOKEN` | When using AssumeRole |
 
+### Preflight: `opsmitra validate`
+
+Run `opsmitra validate --strict` before any send-mode invocation or AWS
+round-trip. The validator confirms every required env var for every active mode
+without making a single network call. The Slack webhook URL value is never
+printed — only its `set`/`unset` presence — so the command is safe to paste
+into CI logs.
+
+```bash
+.venv/bin/python -m opsmitra validate --strict
+```
+
 ### No Commits
 
 - Add `*.env`, `.env.local`, and `*.secret` to `.gitignore`.

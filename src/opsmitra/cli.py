@@ -124,6 +124,36 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional path to thresholds JSON config file (same format as 'run' subcommand).",
     )
 
+    # validate subcommand
+    validate_parser = subparsers.add_parser(
+        "validate",
+        help="Preflight env-var validation per feature mode (no network).",
+    )
+    validate_parser.add_argument(
+        "--mode",
+        default="all",
+        metavar="LIST",
+        help=(
+            "Comma-separated modes to validate: model, slack, aws-source, aws-sink, "
+            "runtime, eval (default: all)."
+        ),
+    )
+    validate_parser.add_argument(
+        "--report",
+        choices=("json", "table"),
+        default="table",
+        help="Report output format: 'table' (default) or 'json'.",
+    )
+    validate_parser.add_argument(
+        "--strict",
+        action="store_true",
+        default=False,
+        help=(
+            "Exit 1 if any required-for-active-mode env var is missing or invalid. "
+            "Without --strict, errors are reported but exit stays 0."
+        ),
+    )
+
     return parser
 
 
@@ -359,9 +389,45 @@ def _cmd_eval(args: argparse.Namespace) -> int:
     return 2 if any_missed else 0
 
 
+def _cmd_validate(args: argparse.Namespace) -> int:
+    """Run the env validation preflight and emit a per-mode report."""
+    from opsmitra.validation import (
+        format_report_json,
+        format_report_table,
+        parse_modes_arg,
+        validate,
+    )
+
+    try:
+        modes = parse_modes_arg(args.mode)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 64  # EX_USAGE, matches argparse misuse semantics
+
+    try:
+        report = validate(modes=modes)
+    except ValueError as exc:
+        # Config bounds errors surface here with the same message they'd give
+        # at runtime — exposing them at preflight is the whole point.
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    rendered = (
+        format_report_json(report) if args.report == "json" else format_report_table(report)
+    )
+    print(rendered)
+
+    if args.strict and report.overall_status == "error":
+        return 1
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    if args.command == "validate":
+        return _cmd_validate(args)
 
     if args.command == "eval":
         return _cmd_eval(args)

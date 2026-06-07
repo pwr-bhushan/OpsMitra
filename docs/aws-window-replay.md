@@ -96,6 +96,17 @@ export OPSMITRA_DRY_RUN=true
 Keep `OPSMITRA_DRY_RUN=true` for the replay exercise to avoid sending real Slack
 alerts while you are tuning thresholds.
 
+Before the first Athena round-trip, run the **preflight validator** to confirm
+the AWS env vars are wired correctly:
+
+```bash
+.venv/bin/python -m opsmitra validate --mode aws-source --strict
+```
+
+Exit `0` means every required AWS env var is set; exit `1` means something
+is missing (e.g. you forgot `OPSMITRA_ATHENA_OUTPUT_LOCATION`). This costs
+nothing — it makes no network call.
+
 ---
 
 ## Run Detector

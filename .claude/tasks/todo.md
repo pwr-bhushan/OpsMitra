@@ -1,6 +1,6 @@
 # OpsMitra Task Tracker
 
-## Current Phase: ✅ BUILD PLAN COMPLETE — all 10 steps shipped
+## Current Phase: ✅ BUILD PLAN COMPLETE — 10 v0 steps + Step 11 (env validation preflight) shipped
 
 - [x] Add scheduler + runtime CLI with fingerprint cooldown and structured logging.
 - [x] Create initial OpsMitra build plan.
@@ -28,6 +28,7 @@
 - [x] Step 8: Add Scheduler and Runtime Command
 - [x] Step 9: Build Evaluation Harness
 - [x] Step 10: Security, Cost, and Documentation Hardening
+- [x] Step 11 (post-v0): Env Validation Preflight — `opsmitra validate` subcommand consolidating per-mode required/optional env var checks
 
 ## Review Notes
 
@@ -42,3 +43,4 @@
 - Step 8 scheduler + runtime CLI added with `Runtime` orchestrator (EventSource → detectors → Summarizer → SlackAlerter pipeline), `AnomalyCooldown` JSON-backed dedup with tz-aware datetimes, `python -m opsmitra run` entry point, exit codes 0/1/2 distinguishing clean/error/anomalies-detected, and structured logging proven safe (sentinel webhook URL never leaks); 197/197 tests passing at 95% suite coverage.
 - Step 9 evaluation harness added with `EvaluationCase`/`CaseResult`/`EvaluationReport` dataclasses, fixture-based replay (3 committed: sms-abuse-baseline, auth-burst-baseline, noise-only), bipartite match with deterministic anomaly sort, p95 nearest-rank for n≥100, `detection_delay_upper_bound_seconds` upper-bound metric, 1 MB fixture cap, `--strict` mode that fails only on `must_detect` misses; 230/230 tests passing at 95% suite coverage.
 - Step 10 hardening shipped: 4 Mermaid diagrams (3 in architecture.md, 1 in README), security checklist with least-privilege IAM, AWS cost controls with workgroup byte cap, AWS-window replay exercise template, threshold unification M6 preserving baseline-ratio defense, durable cooldown fcntl lock on `<path>.lock`, argparse exit 64 (EX_USAGE), CLI `--config-file` fully wired for both `run` and `eval` subcommands; 253/253 tests passing at 95% suite coverage. FINAL build plan step complete.
+- Step 11 (post-v0) env validation preflight shipped: `opsmitra validate` subcommand with auto-detected mode activation (model/slack/aws-source/aws-sink/runtime/eval), required-vs-optional env var checks, cross-field invariants (dry_run=false ↔ webhook required, EVENT_SOURCE=athena ↔ Athena output location required, EVENT_SINK=s3 ↔ S3 bucket required), webhook URL never appears in rendered output (set/unset only), table + JSON output formats, `--strict` exit-1 CI gating; 294/294 tests passing, validation.py 99%, suite 94%. README + security-checklist.md + aws-window-replay.md updated to reference the command.
