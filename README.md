@@ -1,5 +1,7 @@
 # OpsMitra
 
+[![CI](https://github.com/pwr-bhushan/OpsMitra/actions/workflows/ci.yml/badge.svg)](https://github.com/pwr-bhushan/OpsMitra/actions/workflows/ci.yml)
+
 OpsMitra is a private AI-assisted log anomaly detector for learning AWS, local model
 integration, alerting, and AI-native backend design.
 
