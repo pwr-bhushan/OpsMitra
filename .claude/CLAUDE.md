@@ -132,27 +132,6 @@ Pin these into every new project's `.claude/tasks/lessons.md` on day one. They c
 - Use the project toolchain path explicitly (e.g. `.venv/bin/pytest`, `./node_modules/.bin/...`). Bare commands resolve via system PATH and silently use the wrong site-packages.
 - Paste the full toolchain path into every subagent prompt. Spawns cold-start and do not inherit shell context.
 
-**Config & Errors**
-- Validate config at load time with field-named errors. Malformed input raises loud — never silently default.
-- Apply a size-budget cap (~1MB typical) with a field-named error on every file input: config, fixtures, lockfiles, datasets.
-
-**Secrets**
-- Redact secrets in `str(exc)` **before** branching on exception type. Subclass exceptions (e.g. `HTTPError` ⊂ `URLError`) can silently turn a safe branch into a leak.
-- Never send raw user data or logs to LLM prompts. Pass scoped evidence only.
-
-**APIs & Architecture**
-- Keep external services (cloud SDKs, third-party APIs) behind a Protocol/interface boundary. Local tests must not require real credentials.
-- Use Protocol/interface typing on orchestrator collaborators — never `Any`. Preserves the contract under refactor and static analysis.
-- Documented-but-dead parameters violate YAGNI. Remove them; do not leave them as placeholders.
-- Metric and field names must be semantically honest (e.g. `_upper_bound_seconds` not `_seconds` when the value is an upper bound).
-- When parallel/overlapping APIs exist, document semantic divergence and any defense the new API cannot tune **immediately**.
-
-**Runtime Hygiene**
-- Validate config-vs-mode invariants in `__init__`, not per-iteration. One clear startup error beats N redacted runtime errors.
-- When bridging API A → API B, default-preserve: forward only what A explicitly exposes; let B's defaults stand for the rest.
-- `fcntl`/`flock` must target a stable named path (`<resource>.lock`), not a per-call temp file. Verify mutual exclusion with a real concurrent holder in tests — never trust the `flock` call alone.
-- Partitioned sink writes need a per-write unique suffix (e.g. UUID). Reusing a partition path silently overwrites prior data.
-
 **Workflow**
 - Work on a feature/dev branch, never `main`.
 - Implementation wins as ground truth on doc/code drift — update the plan to match the code, unless the code name is genuinely misleading.
