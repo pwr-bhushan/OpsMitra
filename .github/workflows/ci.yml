@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+# Cancel in-flight runs on the same ref when a new push lands.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: pytest + validate preflight
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install package with dev extras
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      # The preflight runs with default env (every OPSMITRA_* unset). All
+      # always-active modes (runtime, eval) must be ok; inactive modes pass
+      # trivially. --strict ensures any error in an active mode fails CI.
+      - name: Preflight env validation
+        run: python -m opsmitra validate --strict
+
+      - name: Run pytest with coverage
+        run: pytest --cov=src/opsmitra --cov-report=term-missing
